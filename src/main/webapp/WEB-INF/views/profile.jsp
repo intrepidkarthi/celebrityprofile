@@ -7,6 +7,9 @@
 <title>Celebrity Profile</title>
 </head>
 <body>
-This is the sample page.
+<img src=${data.ImageUrl} alt=${ImageUrl} />
+Name : ${data.Name}
+Occupation : ${data.Occupation}
+
 </body>
 </html>

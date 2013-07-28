@@ -17,9 +17,9 @@ public class DataFeedController {
 		values.put("Name", "Rajini");
 		values.put("Occupation", "Film Actor");
 		values.put("ImageUrl", "http://www.karomasti.in/telugu-cinema/wp-content/uploads/2013/02/rajini.jpg");
-		values.put("Occupation", "Film Actor");
-		values.put("Occupation", "Film Actor");
-		values.put("Occupation", "Film Actor");
+		values.put("Occupation1", "Film Actor");
+		values.put("Occupation2", "Film Actor");
+		values.put("Occupation3", "Film Actor");
 		
 		modelAndView.addObject("data", values);
 		

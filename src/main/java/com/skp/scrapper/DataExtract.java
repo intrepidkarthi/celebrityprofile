@@ -1,136 +1,127 @@
-package com.skp.scrapper;
+package com.thoughtworks.interview;
 
-
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.xml.xpath.XPathExpressionException;
-
-import org.xml.sax.SAXException;
-
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
 import com.gargoylesoftware.htmlunit.html.HtmlTableHeaderCell;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 
+import com.mongodb.*;
+public class DataExtract extends Thread {
 
-public class DataExtract {
+	private static final String folder_name = "/home/senthilkumar/xml/";
 
-	private static final String folder_name= "D://xml//";
+	private static final String WIKI_BASE_URL = "http://en.wikipedia.org";
 
-	public static void main(String... args) throws FailingHttpStatusCodeException, MalformedURLException, IOException, SAXException, XPathExpressionException {
-		WebClient webClient = new WebClient();
-		HtmlPage page = webClient.getPage("http://en.wikipedia.org/wiki/Kamal_Haasan");
-		String opFileName = folder_name+"kamal.csv";
-
-
-		FileWriter fw = new FileWriter(opFileName);
-
-		//get div which has a 'name' attribute of 'John'
-		final List<?> tr =  page.getByXPath("//div[@id='mw-content-text']/table[@class='infobox biography vcard']/tbody/tr");
-		for(Object row: tr) {
-			HtmlTableRow trs = (HtmlTableRow)row;
-			List<HtmlTableCell> cells = trs.getCells();
-			for(HtmlTableCell cell:cells) {
-				if(cell instanceof HtmlTableHeaderCell) {
-					System.out.println("* "+cell.getNodeName()+"  "+cell.getTextContent());
-					fw.append(cell.getTextContent());
-					fw.append(",");
-
-				}
-				else {
-					System.out.println("** "+cell.getNodeValue()+"  "+cell.getTextContent());
-					fw.append(cell.getTextContent());
-					fw.append("\n");
-				}
-			}
-		}
-		fw.close();
-
-		webClient.closeAllWindows();
+	public static void main(String[] args) throws IOException {
+		Thread t1 = new DataExtract();
+		Thread t2 = new DataExtract();
+		Thread t3 = new DataExtract();
+		Thread t4=  new DataExtract();
+		Thread t5 =	new DataExtract();
+		t1.setName("1");
+		t2.setName("2");
+		t3.setName("3");
+		t4.setName("4");
+		t5.setName("5");
+		t1.start();
+		t2.start();
+		t3.start();
+		t4.start();
+		t5.start();
 	}
-
-
-	public void parseWikipedia() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		WebClient webClient = new WebClient();
-		HtmlPage page = webClient.getPage("http://en.wikipedia.org/wiki/Kamal_Haasan");
-		String opFileName = folder_name+"kamal.csv";
-
-		/*String pageAsXml = page.asXml();
-		pageAsXml = pageAsXml.replaceAll("//]]>", "");
-		pageAsXml = pageAsXml.replaceAll("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
-		pageAsXml.trim();
-		File output = new File(folder_name+"kamal.xml");
-		FileOutputStream fos = new FileOutputStream(output);
-		fos.write(pageAsXml.getBytes());
-		fos.flush();
-		fos.close();
-		System.out.println("Page XML :"+pageAsXml);
-		XPath xPath = XPathFactory.newInstance().newXPath();
-
-
-		String expression = "//div[@id=\"mw-content-text\"]/table[2]/tbody/tr";
-
-		DocumentBuilderFactory builderFactory =
-				DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = null;
-		Document xmlDocument = null;
-		FileInputStream fis = new FileInputStream(folder_name+"kamal.xml");
-		Reader reader = new InputStreamReader(fis,"UTF-8");
-
-		InputSource is = new InputSource(reader);
-		is.setEncoding("UTF-8");
+	
+	public void run() {
 		try {
-			builder = builderFactory.newDocumentBuilder();
-			xmlDocument = builder.parse(is);
-		} catch (ParserConfigurationException e) {
+			processThread();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static void processThread() throws IOException {
+		String threadName = Thread.currentThread().getName();
+		String file = folder_name + "actressinput"+threadName+".txt";
+		FileReader in = new FileReader(file);
+		BufferedReader br = new BufferedReader(in);
+		String line = br.readLine();
+		while (line != null) {
+			String data[] = line.split("	");
+			System.out.println(line);
+			if(!"Link".equalsIgnoreCase(data[0])) {
+				processWiki(data[0], data[1]);
+			}
+			line = br.readLine();
+		}
+		br.close();
+	}
 
+	public static void processWiki(String fileName, String url) throws IOException {
 
-		//read a string value
-		String email = xPath.compile(expression).evaluate(xmlDocument);
-
-		//read an xml node using xpath
-		Node node = (Node) xPath.compile(expression).evaluate(xmlDocument, XPathConstants.NODE);
-
-		//read a nodelist using xpath
-		NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, XPathConstants.NODESET);*/
-
-		//get list of all divs
-		final List<?> divs = page.getByXPath("//div");
-
-		FileWriter fw = new FileWriter(opFileName);
-
-		//get div which has a 'name' attribute of 'John'
+		WebClient webClient = new WebClient();
+		url = WIKI_BASE_URL + url;
+		HtmlPage page = webClient.getPage(url);
 		final List<?> tr =  page.getByXPath("//div[@id='mw-content-text']/table[@class='infobox biography vcard']/tbody/tr");
+		String key = "";
+		String value = "";
+		Map<String, Object> valuesMap = new HashMap<>();
 		for(Object row: tr) {
 			HtmlTableRow trs = (HtmlTableRow)row;
 			List<HtmlTableCell> cells = trs.getCells();
 			for(HtmlTableCell cell:cells) {
 				if(cell instanceof HtmlTableHeaderCell) {
 					System.out.println("* "+cell.getNodeName()+"  "+cell.getTextContent());
-					fw.append(cell.getTextContent());
-					fw.append(",");
+					key = cell.getTextContent();
 
 				}
 				else {
 					System.out.println("** "+cell.getNodeValue()+"  "+cell.getTextContent());
-					fw.append(cell.getTextContent());
-					fw.append("\n");
+					value = cell.getTextContent();
+					valuesMap.put(key, value);
+					value = "";
+					key = "";
 				}
 			}
 		}
-
+		saveObject(valuesMap);
+		valuesMap.clear();
 
 		webClient.closeAllWindows();
-
 	}
+	
+	public static void saveObject(Map<String, Object> map) throws UnknownHostException {
+		MongoClient  client = new MongoClient();
+		DB db = client.getDB("profile");
+		DBCollection collection = db.getCollection("profiles");
+		DBObject obje = new BasicDBObject();
+		obje.putAll(map);
+		collection.insert(obje);
+	}
+	
+	/*public Profile createProfile(Profile profile, String key, String value) {
+		
+		if(key !=null && key!="") {
+			
+			if("Born".equalsIgnoreCase(key)) {
+				profile.setBorn(value);
+			} else if("Occupation".equalsIgnoreCase(key)) {
+				profile.setOccupation(value);
+			} else if("Residence".equalsIgnoreCase(key)) {
+				profile.setResidence(value);
+			}
+		}
+		
+		return profile;
+	}*/
 
 }
-
 

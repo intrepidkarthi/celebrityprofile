@@ -14,8 +14,6 @@ import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.ServletWebArgumentResolverAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
@@ -26,8 +24,8 @@ import com.skp.controller.DataFeedController;
 
 @Configuration
 @EnableWebMvc
-//@Import(value = {ComponentConfig.class, DataConfig.class, ExplicitSocialConfig.class})
-//@PropertySource("classpath:config.properties")
+@Import(value = {ComponentConfig.class})
+@PropertySource("classpath:config.properties")
 @ComponentScan(basePackageClasses={DataFeedController.class})
 public class WebConfig extends WebMvcConfigurerAdapter {
 
